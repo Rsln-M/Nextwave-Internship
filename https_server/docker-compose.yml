@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  secure-https-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: secure-https-server
+    ports:
+      - "443:443"
+    volumes:
+      - ./firmware:/app/firmware
+      - ./logs:/app/logs
+      - ./certs:/app/certs
+      - ./config.json:/app/config.json
+    environment:
+      - SERVER_PORT=443
+      - CERT_PATH=/app/certs/fullchain.pem
+      - KEY_PATH=/app/certs/privkey.pem
+    restart: unless-stopped
+    # For development/testing with self-signed certificates
+    # command: >
+    #   sh -c "openssl req -x509 -nodes -days 365 -newkey rsa:2048 
+    #          -keyout /app/certs/privkey.pem 
+    #          -out /app/certs/fullchain.pem 
+    #          -subj '/CN=localhost' && python secure_https_server.py"
